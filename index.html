@@ -1,0 +1,556 @@
+<!DOCTYPE html>
+<html lang="uz">
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+  <title>EZOZ MARKET — onlayn supermarket</title>
+  <script src="https://telegram.org/js/telegram-web-app.js"></script>
+  <style>
+    :root {
+      --red: #e60000;
+      --dark: #b70100;
+      --bg: #f9f9ff;
+      --card: #fff;
+      --tx: #141b2b;
+      --mut: #6b7280;
+      --soft: #e9edff;
+      --ok: #006645
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0
+    }
+
+    body {
+      font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
+      background: var(--bg);
+      color: var(--tx);
+      padding-bottom: 90px
+    }
+
+    header {
+      background: #fff;
+      position: sticky;
+      top: 0;
+      z-index: 5;
+      box-shadow: 0 1px 8px #0001;
+      padding: 10px 14px
+    }
+
+    .top {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      max-width: 1100px;
+      margin: auto
+    }
+
+    .logo {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-weight: 900;
+      font-size: 18px;
+      white-space: nowrap
+    }
+
+    .logo i {
+      background: var(--red);
+      color: #fff;
+      border-radius: 10px;
+      width: 34px;
+      height: 34px;
+      display: grid;
+      place-items: center;
+      font-style: normal
+    }
+
+    .logo b {
+      color: var(--red)
+    }
+
+    input,
+    textarea,
+    select {
+      width: 100%;
+      padding: 12px 14px;
+      border: 1.5px solid #dde3f5;
+      border-radius: 12px;
+      font: inherit;
+      background: #fff
+    }
+
+    input:focus,
+    textarea:focus {
+      outline: none;
+      border-color: var(--red)
+    }
+
+    main {
+      max-width: 1100px;
+      margin: auto;
+      padding: 14px
+    }
+
+    .hero {
+      background: linear-gradient(135deg, var(--red), var(--dark));
+      color: #fff;
+      border-radius: 20px;
+      padding: 20px;
+      margin-bottom: 14px
+    }
+
+    .hero h1 {
+      font-size: 22px;
+      margin-bottom: 6px
+    }
+
+    .hero p {
+      opacity: .9;
+      font-size: 14px
+    }
+
+    .chips {
+      display: flex;
+      gap: 8px;
+      overflow-x: auto;
+      padding-bottom: 6px;
+      margin-bottom: 12px
+    }
+
+    .chip {
+      border: 0;
+      background: #fff;
+      padding: 9px 15px;
+      border-radius: 99px;
+      font: 600 14px inherit;
+      white-space: nowrap;
+      cursor: pointer;
+      box-shadow: 0 1px 4px #0001
+    }
+
+    .chip.on {
+      background: var(--red);
+      color: #fff
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+      gap: 12px
+    }
+
+    .p {
+      background: var(--card);
+      border-radius: 18px;
+      padding: 12px;
+      display: flex;
+      flex-direction: column;
+      box-shadow: 0 1px 6px #0000000d
+    }
+
+    .p .e {
+      background: var(--soft);
+      border-radius: 14px;
+      height: 90px;
+      display: grid;
+      place-items: center;
+      font-size: 46px;
+      margin-bottom: 8px
+    }
+
+    .p small {
+      color: var(--mut);
+      font-size: 12px
+    }
+
+    .p h3 {
+      font-size: 14px;
+      margin: 2px 0 6px;
+      flex: 1;
+      line-height: 1.3
+    }
+
+    .p .pr {
+      font-weight: 800;
+      margin-bottom: 8px
+    }
+
+    .btn {
+      border: 0;
+      background: var(--red);
+      color: #fff;
+      padding: 11px;
+      border-radius: 12px;
+      font: 700 14px inherit;
+      cursor: pointer;
+      width: 100%
+    }
+
+    .btn:disabled {
+      opacity: .5
+    }
+
+    .qty {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      background: var(--soft);
+      border-radius: 12px
+    }
+
+    .qty button {
+      border: 0;
+      background: none;
+      font: 700 20px inherit;
+      width: 42px;
+      height: 40px;
+      cursor: pointer;
+      color: var(--dark)
+    }
+
+    .bar {
+      position: fixed;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      padding: 12px 14px calc(12px + env(safe-area-inset-bottom));
+      background: #fff;
+      box-shadow: 0 -2px 12px #0002;
+      z-index: 6;
+      display: none
+    }
+
+    .bar .btn {
+      max-width: 1100px;
+      margin: auto;
+      display: flex;
+      justify-content: space-between;
+      padding: 14px 18px;
+      font-size: 16px
+    }
+
+    .sheet {
+      position: fixed;
+      inset: 0;
+      background: #0007;
+      z-index: 10;
+      display: none;
+      align-items: flex-end;
+      justify-content: center
+    }
+
+    .sheet.on {
+      display: flex
+    }
+
+    .sh {
+      background: var(--bg);
+      width: 100%;
+      max-width: 560px;
+      max-height: 92vh;
+      overflow: auto;
+      border-radius: 22px 22px 0 0;
+      padding: 18px
+    }
+
+    .sh h2 {
+      margin-bottom: 12px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center
+    }
+
+    .x {
+      border: 0;
+      background: var(--soft);
+      width: 34px;
+      height: 34px;
+      border-radius: 50%;
+      font-size: 16px;
+      cursor: pointer
+    }
+
+    .row {
+      display: flex;
+      gap: 10px;
+      align-items: center;
+      background: #fff;
+      border-radius: 14px;
+      padding: 10px;
+      margin-bottom: 8px
+    }
+
+    .row .n {
+      flex: 1;
+      font-size: 14px;
+      font-weight: 600
+    }
+
+    .row .n small {
+      display: block;
+      color: var(--mut);
+      font-weight: 400
+    }
+
+    .row .qty {
+      width: 116px
+    }
+
+    .sum {
+      background: #fff;
+      border-radius: 14px;
+      padding: 12px;
+      margin: 12px 0;
+      font-size: 14px
+    }
+
+    .sum div {
+      display: flex;
+      justify-content: space-between;
+      padding: 3px 0
+    }
+
+    .sum .t {
+      font-weight: 900;
+      font-size: 18px;
+      color: var(--dark);
+      border-top: 1px dashed #ccd;
+      margin-top: 6px;
+      padding-top: 8px
+    }
+
+    label {
+      display: block;
+      font: 600 13px inherit;
+      margin: 10px 0 5px;
+      color: #444
+    }
+
+    .pay {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px
+    }
+
+    .pay label {
+      margin: 0;
+      border: 1.5px solid #dde3f5;
+      border-radius: 12px;
+      padding: 11px;
+      text-align: center;
+      cursor: pointer;
+      background: #fff
+    }
+
+    .pay input {
+      display: none
+    }
+
+    .pay input:checked+span {
+      color: var(--red);
+      font-weight: 800
+    }
+
+    .pay label:has(input:checked) {
+      border-color: var(--red);
+      background: #fff0f0
+    }
+
+    .steps {
+      display: flex;
+      justify-content: space-between;
+      margin: 18px 0
+    }
+
+    .st {
+      flex: 1;
+      text-align: center;
+      font-size: 11px;
+      color: var(--mut);
+      position: relative
+    }
+
+    .st:before {
+      content: "";
+      position: absolute;
+      top: 13px;
+      left: -50%;
+      width: 100%;
+      height: 3px;
+      background: #dde3f5
+    }
+
+    .st:first-child:before {
+      display: none
+    }
+
+    .st i {
+      display: grid;
+      place-items: center;
+      width: 28px;
+      height: 28px;
+      border-radius: 50%;
+      background: #dde3f5;
+      margin: 0 auto 5px;
+      position: relative;
+      font-style: normal;
+      font-size: 13px
+    }
+
+    .st.d i,
+    .st.d:before {
+      background: var(--ok);
+      color: #fff
+    }
+
+    .st.d {
+      color: var(--ok);
+      font-weight: 700
+    }
+
+    .st.c i {
+      background: var(--red);
+      color: #fff
+    }
+
+    .st.c {
+      color: var(--red);
+      font-weight: 700
+    }
+
+    .empty {
+      text-align: center;
+      color: var(--mut);
+      padding: 40px 0
+    }
+
+    .tgb {
+      display: block;
+      text-align: center;
+      background: #229ed9;
+      color: #fff;
+      padding: 12px;
+      border-radius: 12px;
+      text-decoration: none;
+      font-weight: 700;
+      margin-top: 12px
+    }
+  </style>
+</head>
+
+<body>
+  <header>
+    <div class="top">
+      <div class="logo"><i>E</i>EZOZ <b>MARKET</b></div>
+      <input id="q" placeholder="🔍 Mahsulot qidirish…">
+    </div>
+  </header>
+
+  <main>
+    <div class="hero">
+      <h1>Kerakli mahsulotlar — bir joyda!</h1>
+      <p id="heroP">Toshkent bo'ylab tezkor yetkazib berish • 08:00–23:00</p>
+    </div>
+    <div id="track" style="display:none"></div>
+    <div class="chips" id="chips"></div>
+    <div class="grid" id="grid"></div>
+  </main>
+
+  <div class="bar" id="bar"><button class="btn" onclick="openCart()"><span>🛒 Savat · <span id="bc">0</span>
+        ta</span><span id="bt">0 so'm</span></button></div>
+
+  <div class="sheet" id="cartSheet" onclick="if(event.target===this)closeS()">
+    <div class="sh">
+      <h2>🛒 Savat <button class="x" onclick="closeS()">✕</button></h2>
+      <div id="cartList"></div>
+      <div class="sum" id="sum"></div>
+      <div id="form">
+        <label>Ism</label><input id="fn" autocomplete="name">
+        <label>Telefon</label><input id="fp" type="tel" placeholder="+998 90 123 45 67" autocomplete="tel">
+        <label>Manzil (ko'cha, uy, xonadon, mo'ljal)</label><textarea id="fa" rows="2"></textarea>
+        <label>Kuryer uchun izoh (ixtiyoriy)</label><input id="fc" placeholder="Masalan: domofon kodi 45K">
+        <label>To'lov usuli</label>
+        <div class="pay">
+          <label><input type="radio" name="pay" value="cash" checked><span>💵 Naqd pul</span></label>
+          <label><input type="radio" name="pay" value="card"><span>💳 Karta orqali</span></label>
+        </div>
+        <button class="btn" id="go" style="margin-top:16px;padding:15px;font-size:16px" onclick="order()">Buyurtma
+          berish</button>
+        <p id="err" style="color:var(--red);font-size:13px;margin-top:8px"></p>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const tg = window.Telegram && Telegram.WebApp; if (tg) { tg.ready(); tg.expand() }
+    const $ = id => document.getElementById(id), fmt = n => n.toLocaleString("ru-RU").replace(/,/g, " ") + " so'm";
+    const ls = { get: k => { try { return JSON.parse(localStorage.getItem(k)) } catch (e) { return null } }, set: (k, v) => { try { localStorage.setItem(k, JSON.stringify(v)) } catch (e) { } } };
+    let P = [], cart = ls.get("cart") || {}, cat = "Barchasi", cfg = { fee: 10000, free_from: 150000 }, timer;
+
+    async function init() {
+      cfg = await (await fetch("/api/config")).json();
+      P = await (await fetch("/api/products")).json();
+      $("heroP").textContent = `${cfg.free_from.toLocaleString("ru-RU")} so'mdan yuqori buyurtmada yetkazish bepul • ${cfg.phone}`;
+      const u = ls.get("user") || {}; $("fn").value = u.name || (tg && tg.initDataUnsafe.user ? tg.initDataUnsafe.user.first_name : "") || ""; $("fp").value = u.phone || ""; $("fa").value = u.address || "";
+      cart = Object.fromEntries(Object.entries(cart).filter(([id]) => P.some(p => p.id == id)));
+      draw(); bar(); const lo = ls.get("last"); if (lo) track(lo)
+    }
+    function draw() {
+      const cats = ["Barchasi", ...new Set(P.map(p => p.category))];
+      $("chips").innerHTML = cats.map(c => `<button class="chip ${c == cat ? "on" : ""}" onclick="cat='${c.replace(/'/g, "\\'")}';draw()">${c}</button>`).join("");
+      const s = $("q").value.toLowerCase();
+      const L = P.filter(p => (cat == "Barchasi" || p.category == cat) && p.name.toLowerCase().includes(s));
+      $("grid").innerHTML = L.length ? L.map(p => `<div class="p"><div class="e">${p.emoji}</div><small>${p.category}</small><h3>${p.name}</h3><div class="pr">${fmt(p.price)}</div>${ctl(p.id)}</div>`).join("") : `<div class="empty" style="grid-column:1/-1">Hech narsa topilmadi</div>`;
+    }
+    const ctl = id => cart[id] ? `<div class="qty"><button onclick="add(${id},-1)">−</button><b>${cart[id]}</b><button onclick="add(${id},1)">+</button></div>` : `<button class="btn" onclick="add(${id},1)">Savatga</button>`;
+    function add(id, d) { cart[id] = (cart[id] || 0) + d; if (cart[id] <= 0) delete cart[id]; ls.set("cart", cart); draw(); bar(); if ($("cartSheet").classList.contains("on")) openCart() }
+    const sub = () => Object.entries(cart).reduce((s, [id, q]) => s + P.find(p => p.id == id).price * q, 0);
+    function bar() { const n = Object.values(cart).reduce((a, b) => a + b, 0); $("bar").style.display = n ? "block" : "none"; $("bc").textContent = n; $("bt").textContent = fmt(sub()) }
+    function openCart() {
+      const ids = Object.keys(cart);
+      if (!ids.length) { closeS(); return }
+      $("cartList").innerHTML = ids.map(id => { const p = P.find(x => x.id == id); return `<div class="row"><span style="font-size:28px">${p.emoji}</span><div class="n">${p.name}<small>${fmt(p.price)}</small></div><div class="qty"><button onclick="add(${id},-1)">−</button><b>${cart[id]}</b><button onclick="add(${id},1)">+</button></div></div>` }).join("");
+      const s = sub(), f = s >= cfg.free_from ? 0 : cfg.fee;
+      $("sum").innerHTML = `<div><span>Mahsulotlar</span><span>${fmt(s)}</span></div><div><span>Yetkazib berish</span><span>${f ? fmt(f) : "Bepul 🎉"}</span></div><div class="t"><span>Jami</span><span>${fmt(s + f)}</span></div>`;
+      $("cartSheet").classList.add("on")
+    }
+    const closeS = () => $("cartSheet").classList.remove("on");
+    async function order() {
+      $("err").textContent = ""; $("go").disabled = true;
+      const body = {
+        name: $("fn").value, phone: $("fp").value, address: $("fa").value, comment: $("fc").value,
+        payment: document.querySelector("[name=pay]:checked").value, initData: tg ? tg.initData : "",
+        items: Object.entries(cart).map(([id, qty]) => ({ id: +id, qty }))
+      };
+      try {
+        const r = await fetch("/api/order", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(body) });
+        const d = await r.json(); if (!r.ok) throw new Error(d.error || "Xatolik");
+        ls.set("user", { name: body.name, phone: body.phone, address: body.address });
+        const o = { id: d.id, phone: body.phone, linked: d.linked }; ls.set("last", o);
+        cart = {}; ls.set("cart", cart); draw(); bar(); closeS(); track(o); scrollTo({ top: 0, behavior: "smooth" })
+      } catch (e) { $("err").textContent = e.message }
+      $("go").disabled = false
+    }
+    const STEPS = ["Yuborildi", "Qabul", "Tayyorlanmoqda", "Yo'lda", "Yetkazildi"], IDX = { new: 0, accepted: 1, preparing: 2, assigned: 2, delivering: 3, delivered: 4 };
+    async function track(o) {
+      clearTimeout(timer);
+      try {
+        const r = await fetch(`/api/order/${o.id}?phone=${encodeURIComponent(o.phone)}`); if (!r.ok) { $("track").style.display = "none"; return }
+        const d = await r.json(), i = IDX[d.status] ?? 0, bad = d.status == "cancelled";
+        $("track").style.display = "block";
+        $("track").innerHTML = `<div class="sum" style="margin:0 0 14px"><div><b>Buyurtma #${d.id}</b><b>${fmt(d.total)}</b></div>
+      ${bad ? `<p style="color:var(--red);font-weight:700;margin:8px 0">❌ Bekor qilindi</p>` : `<div class="steps">${STEPS.map((s, k) => `<div class="st ${k < i || d.status == "delivered" ? "d" : k == i ? "c" : ""}"><i>${k < i || d.status == "delivered" ? "✓" : k + 1}</i>${s}</div>`).join("")}</div>
+      <p style="text-align:center;font-weight:700">${d.text}</p>`}
+      ${d.courier ? `<p style="text-align:center;font-size:14px;margin-top:6px">🧑‍✈️ Kuryer: ${d.courier.name} ${d.courier.phone ? `<a href="tel:${d.courier.phone}">${d.courier.phone}</a>` : ""}</p>` : ""}
+      ${d.status == "delivered" || bad ? `<button class="x" style="width:auto;padding:0 14px;margin-top:8px" onclick="ls.set('last',null);$('track').style.display='none'">Yopish</button>` : ""}</div>`;
+        if (d.status != "delivered" && !bad) timer = setTimeout(() => track(o), 8000)
+      } catch (e) { timer = setTimeout(() => track(o), 15000) }
+    }
+    $("q").oninput = draw; init();
+  </script>
+</body>
+
+</html>
